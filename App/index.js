@@ -7,85 +7,142 @@ canvas.height = h;
 
 var ctx = canvas.getContext('2d');
 
-var randomColor = function() { return '#'+(Math.random()*0xFFFFFF<<0).toString(16); }
+var _ = {
+    randomColor: function() { return '#'+(Math.random()*0xFFFFFF<<0).toString(16); }
+  , pointInCircle: function(pX, pY, cX, cY, r){
+    var dx = pX - cX; var dy = pY - cY;
+    return (dx*dx + dy*dy <= r * r)
+  }
+  , clearScreen: function() {
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, w, h)
+  }
+  , drawCircle: function(circle) {
+    ctx.fillStyle = circle.c
+    ctx.beginPath()
+    ctx.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI, true)
+    ctx.fill()
+    ctx.stroke()
+  }
+  , addEventListeners: function(events, handler) {
+    for(var i=0; i<events.length; i++){
+      canvas.addEventListener(events[i], handler, false);
+    }
+  }
+  , removeEventListeners: function(events, handler) {
+    for(var i=0; i<events.length; i++){
+      canvas.removeEventListener(events[i], handler, false);
+    }
+  }
+}
 
 var scene, loopId;
-var scenes = {};
-var cr = w/6,
-    cx = w/2,
-    cy = h/2;
+var scenes = {}
+var circles = []
+var touch_to_circle_map = {}
 
-var mouseInCircle = function(mouseX, mouseY, circleX, circleY, radius){
-  var dx = mouseX - circleX;
-  var dy = mouseY - circleY;
+var loop = function() {
+  _.clearScreen()
+  var oldStyle = ctx.fillStyle
+  ctx.fillStyle="#FF00FF"
+  ctx.fillText("hi there", 150, 150)
+  ctx.fillStyle = oldStyle
 
-  return (dx*dx + dy*dy <= radius * radius)
+  for(var i = 0; i < circles.length; i++){
+    _.drawCircle(circles[i])
+  }
+}
+
+var gotoScene = function(newscene){
+  if(scene) { scene.cleanup() }
+  if(loopId) { clearInterval(loopId) }
+
+  scene = scenes[newscene]
+  _.clearScreen()
+  scene.setup()
+  loopId = setInterval(loop, 1000/60)
 }
 
 scenes.start = {
   startCircles: function( event ) {
-    touchX = event.clientX || event.targetTouches[0].clientX;
-    touchY = event.clientY || event.targetTouches[0].clientY;
-    if (mouseInCircle(touchX, touchY, cx, cy, cr)){
-      changeScene('circles');
+    touchX = event.clientX || event.targetTouches[0].clientX
+    touchY = event.clientY || event.targetTouches[0].clientY
+    c = circles[0]
+    if (_.pointInCircle(touchX, touchY, c.x, c.y, c.r)){
+      gotoScene('circles')
     }
   },
   setup: function() {
-    ctx.fillStyle = '#ffffff';
-    console.log('in start scene!');
-    ctx.beginPath();
-    ctx.arc(cx, cy, cr, 0, 2*Math.PI, true);
-    ctx.fill();
-    ctx.stroke();
-    canvas.addEventListener( 'touchstart', this.startCircles, false );
-    canvas.addEventListener( 'click', this.startCircles, false );
-  },
-  loop: function() {
-    //console.log(Date.now());
+    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
+    _.addEventListeners( ['touchstart'], this.startCircles, false )
+    _.addEventListeners( ['click'], this.startCircles, false )
   },
   cleanup: function() {
-    console.log('exiting start');
-    document.removeEventListener( 'touchstart', this.startCirles );
+    _.removeEventListeners( ['click'], this.startCircles )
+    _.removeEventListeners( ['touchstart'], this.startCircles )
+    circles = []
   }
 }
 
 scenes.circles = {
-  drawCircles: function( event ) {
-    for (var i = 0; i < event.touches.length; i++) {
-      var touch = event.touches[i];
-      ctx.beginPath();
-      ctx.arc(touch.pageX, touch.pageY, 20, 0, 2*Math.PI, true);
-      ctx.fill();
-      ctx.stroke();
-    }
-  },
-  changeFill: function( event ){
-    ctx.fillStyle = randomColor();
-  },
   setup: function() {
-    ctx.fillStyle = '#000000';
-    ctx.fillRect( 0, 0, w, h );
+    circles.push({x: 1*w/3, y: h/2, r: h/12, c: _.randomColor()})
+    circles.push({x: 2*w/3, y: h/2, r: h/12, c: _.randomColor()})
 
-    ctx.globalAlpha = 0.05;
-    ctx.lineWidth = 2;
-    document.addEventListener( 'touchstart', this.changeFill, false );
-    document.addEventListener( 'touchmove', this.drawCircles, false );
-  },
-  loop: function() {
+    _.addEventListeners( ['touchstart', 'touchend', 'mousedown', 'mouseup'], this.lockCircles)
+    _.addEventListeners( ['touchmove', 'mousemove'], this.moveCircles )
   },
   cleanup: function() {
-    document.removeEventListener( 'touchstart', this.changeFill );
-    document.removeEventListener( 'touchmove', this.drawCircles );
+    _.removeEventListeners( ['touchstart', 'touchend', 'mousedown', 'mouseup'], this.lockCircles )
+    _.removeEventListeners( ['touchmove', 'mousemove'], this.moveCircles )
+  },
+  lockCircles: function(e) {
+    touch_to_circle_map = {}
+    if(e.targetTouches){
+      for(var i=0; i<e.targetTouches.length; i++){
+        var touchX = e.targetTouches[i].clientX;
+        var touchY = e.targetTouches[i].clientY;
+        for(var j=0; j<circles.length; j++){
+          if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r)){
+            touch_to_circle_map[i] = j;
+          }
+        }
+      }
+    } else {
+      for(var j=0; j<circles.length; j++){
+        if(_.pointInCircle(e.clientX, e.clientY, circles[j].x, circles[j].y, circles[j].r)){
+          touch_to_circle_map[0] = j;
+        }
+      }
+
+    }
+  },
+  moveCircles: function(e) {
+    if(e.targetTouches){
+      for(var i=0; i<e.targetTouches.length; i++){
+        circles[touch_to_circle_map[i]].x = e.targetTouches[i].clientX;
+        circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY;
+      }
+    } else {
+      circles[touch_to_circle_map[0]].x = e.clientX;
+      circles[touch_to_circle_map[0]].y = e.clientY;
+    }
+    if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r)){
+      gotoScene('congrats')
+    }
   }
 }
 
-var changeScene = function(newscene){
-  if(scene) { scene.cleanup() }
-  if(loopId) { clearInterval(loopId) }
-
-  scene = scenes[newscene];
-  scene.setup();
-  loopId = setInterval(scene.loop, 1000/60);
+scenes.congrats = {
+  setup: function() {
+    for(var i=0; i<10; i++){
+      circles.push({x: w * Math.random(), y: h * Math.random(), r: h/10 * Math.random(), c: _.randomColor()})
+    }
+  },
+  cleanup: function() {
+    circles=[]
+  }
 }
 
-changeScene("start");
+
+gotoScene('start')
