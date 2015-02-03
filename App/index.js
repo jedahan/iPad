@@ -30,6 +30,13 @@ var _ = {
     ctx.fill()
     ctx.stroke()
   }
+  , drawText: function(text) {
+    var oldStyle = ctx.fillStyle
+    ctx.fillStyle = text.style
+    ctx.font = text.font
+    ctx.fillText(text.text, text.x, text.y)
+    ctx.fillStyle = oldStyle
+  }
   , addEventListeners: function(events, handler) {
     for(var i=0; i<events.length; i++){
       canvas.addEventListener(events[i], handler, false);
@@ -45,17 +52,18 @@ var _ = {
 var scene, loopId;
 var scenes = {}
 var circles = []
+var text = []
 var touch_to_circle_map = {}
 
 var loop = function() {
   _.clearScreen()
-  var oldStyle = ctx.fillStyle
-  ctx.fillStyle="#FF00FF"
-  ctx.fillText("hi there", 150, 150)
-  ctx.fillStyle = oldStyle
 
   for(var i = 0; i < circles.length; i++){
     _.drawCircle(circles[i])
+  }
+
+  for(var j=0; j < text.length; j++){
+    _.drawText(text[j])
   }
 }
 
@@ -80,6 +88,7 @@ scenes.start = {
   },
   setup: function() {
     circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
+    text.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px Arial"})
     _.addEventListeners( ['touchstart'], this.startCircles, false )
     _.addEventListeners( ['click'], this.startCircles, false )
   },
@@ -87,20 +96,25 @@ scenes.start = {
     _.removeEventListeners( ['click'], this.startCircles )
     _.removeEventListeners( ['touchstart'], this.startCircles )
     circles = []
+    text = []
   }
 }
 
 scenes.circles = {
   setup: function() {
-    circles.push({x: 1*w/3, y: h/2, r: h/12, c: _.randomColor()})
-    circles.push({x: 2*w/3, y: h/2, r: h/12, c: _.randomColor()})
+    circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
+    circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
 
     _.addEventListeners( ['touchstart', 'touchend', 'mousedown', 'mouseup'], this.lockCircles)
     _.addEventListeners( ['touchmove', 'mousemove'], this.moveCircles )
+
+    text.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", font: "40px Arial"})
   },
   cleanup: function() {
     _.removeEventListeners( ['touchstart', 'touchend', 'mousedown', 'mouseup'], this.lockCircles )
     _.removeEventListeners( ['touchmove', 'mousemove'], this.moveCircles )
+    circles = []
+    text = []
   },
   lockCircles: function(e) {
     touch_to_circle_map = {}
@@ -109,14 +123,14 @@ scenes.circles = {
         var touchX = e.targetTouches[i].clientX;
         var touchY = e.targetTouches[i].clientY;
         for(var j=0; j<circles.length; j++){
-          if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r)){
+          if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r / 2)){
             touch_to_circle_map[i] = j;
           }
         }
       }
     } else {
       for(var j=0; j<circles.length; j++){
-        if(_.pointInCircle(e.clientX, e.clientY, circles[j].x, circles[j].y, circles[j].r)){
+        if(_.pointInCircle(e.clientX, e.clientY, circles[j].x, circles[j].y, circles[j].r / 3)){
           touch_to_circle_map[0] = j;
         }
       }
