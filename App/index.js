@@ -189,9 +189,67 @@ scenes.select = {
     if(correct_touches>1){
       text.push({x: 20, y: h/2 + 20, text: "daaamn you good with colors!", style: "#00FF00", font: "60px Arial"})
       setTimeout(function(){
-        gotoScene('congrats')
+        gotoScene('swipe')
       }, 2000)
     }
+  }
+}
+
+
+scenes.swipe = {
+  setup: function() {
+    var move_circle = false
+    colors=["rgba(0,0,0,0.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
+    for(var i =0; i<4; i++){
+      circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i]})
+    }
+
+    _.addEventListeners( ['touchstart'], this.touchCircles )
+    _.addEventListeners( ['touchmove'], this.moveCircles )
+    text.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px Arial"})
+    text.push({x: circles[0].x, y: circles[1].y, text: "0", style: "#0000FF", font: "30px Arial"})
+  },
+  cleanup: function() {
+    _.removeEventListeners( ['touchstart'], scene.touchCircles )
+    _.removeEventListeners( ['touchmove'], scene.moveCircles )
+    circles = []
+    text = []
+  },
+  touchCircles: function(e) {
+    var touchX = e.targetTouches[0].clientX
+    var touchY = e.targetTouches[0].clientY
+    move_circle = _.pointInCircle(touchX, touchY, circles[0].x, circles[0].y, circles[0].r)
+  },
+  moveCircles: function(e) {
+    if(move_circle){
+      var touchX = e.targetTouches[0].clientX
+      var touchY = e.targetTouches[0].clientY
+      circles[0].x = text[1].x = touchX
+      circles[0].y = text[1].y = touchY
+
+      for(var j=1; j<circles.length; j++){
+        if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r/2)){
+          scene.addCircle(j)
+        }
+      }
+
+      if(circles.length==1){
+        text.push({x: 20, y: h/2 + 20, text: "you got them all!", style: "#00FF00", font: "60px Arial"})
+        setTimeout(function(){
+          gotoScene('congrats')
+        }, 2000)
+      }
+    }
+  },
+  addCircle: function(i) {
+    var newcircles = []
+    for(var j=0; j<circles.length; j++){
+      if(j!=i){
+        newcircles.push(circles[i])
+      }
+    }
+    circles=newcircles
+    text[1].text = 4-circles.length
   }
 }
 
