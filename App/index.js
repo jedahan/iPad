@@ -165,6 +165,11 @@ scenes.congrats = {
     for(var i=0; i<100; i++){
       circles.push({x: w * Math.random(), y: h * Math.random(), r: h/10 * Math.random(), c: _.randomAlphaColor()})
     }
+    setInterval(function(){
+      var i = Math.floor(Math.random()*circles.length)
+      circles[i].x += 3 * (Math.random()-0.5)
+      circles[i].y += 3 * (Math.random()-0.5)
+    }, 10)
   },
   cleanup: function() {
     circles=[]
