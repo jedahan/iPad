@@ -152,9 +152,45 @@ scenes.circles = {
     if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
       text.push({x: w/2 - 230, y: h/2 + 20, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px Arial"})
       setTimeout(function(){
-        gotoScene('congrats')
+        gotoScene('select')
       }, 2000)
 
+    }
+  }
+}
+
+scenes.select = {
+  setup: function() {
+    colors=["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
+    for(var i =0; i<9; i++){
+      circles.push({x: 20 + w/24 + (w/9 * i), y: h/2, r: h/12, c: colors[i%3]})
+    }
+
+    _.addEventListeners( ['touchstart'], this.touchCircles )
+
+    text.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", font: "40px Arial"})
+  },
+  cleanup: function() {
+    _.removeEventListeners( ['touchstart'], this.touchCircles )
+    circles = []
+    text = []
+  },
+  touchCircles: function(e) {
+    var correct_touches=0
+    for(var i=0; i<e.targetTouches.length; i++){
+      var touchX = e.targetTouches[i].clientX;
+      var touchY = e.targetTouches[i].clientY;
+      for(var j=1; j<circles.length; j+=3){
+        if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r)){
+          correct_touches++
+        }
+      }
+    }
+    if(correct_touches>1){
+      text.push({x: 20, y: h/2 + 20, text: "daaamn you good with colors!", style: "#00FF00", font: "60px Arial"})
+      setTimeout(function(){
+        gotoScene('congrats')
+      }, 2000)
     }
   }
 }
