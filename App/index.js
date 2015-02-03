@@ -28,7 +28,6 @@ var _ = {
     ctx.beginPath()
     ctx.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI, true)
     ctx.fill()
-    ctx.stroke()
   }
   , drawText: function(text) {
     var oldStyle = ctx.fillStyle
