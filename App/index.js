@@ -13,6 +13,12 @@ var _ = {
     var dx = pX - cX; var dy = pY - cY;
     return (dx*dx + dy*dy <= r * r)
   }
+  , randomAlphaColor: function() {
+      return 'rgba('+Math.floor(Math.random()*255)
+               + ','+Math.floor(Math.random()*255)
+               + ','+Math.floor(Math.random()*255)
+               + ','+Math.random()+')'
+  }
   , clearScreen: function() {
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, w, h)
@@ -124,19 +130,26 @@ scenes.circles = {
         circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY;
       }
     } else {
-      circles[touch_to_circle_map[0]].x = e.clientX;
-      circles[touch_to_circle_map[0]].y = e.clientY;
+      if(touch_to_circle_map){
+        circles[touch_to_circle_map[0]] = circles[touch_to_circle_map[0]] || {x: null, y: null}
+        circles[touch_to_circle_map[0]].x = e.clientX;
+        circles[touch_to_circle_map[0]].y = e.clientY;
+      }
     }
-    if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r)){
-      gotoScene('congrats')
+    if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
+      text.push({x: w/2 - 230, y: h/2 + 20, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px Arial"})
+      setTimeout(function(){
+        gotoScene('congrats')
+      }, 2000)
+
     }
   }
 }
 
 scenes.congrats = {
   setup: function() {
-    for(var i=0; i<10; i++){
-      circles.push({x: w * Math.random(), y: h * Math.random(), r: h/10 * Math.random(), c: _.randomColor()})
+    for(var i=0; i<100; i++){
+      circles.push({x: w * Math.random(), y: h * Math.random(), r: h/10 * Math.random(), c: _.randomAlphaColor()})
     }
   },
   cleanup: function() {
