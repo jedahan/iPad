@@ -1,11 +1,11 @@
-var w = window.innerWidth;
-var h = window.innerHeight;
+var w = window.innerWidth
+var h = window.innerHeight
 
-var canvas = document.getElementById('canvas');
-canvas.width = w;
-canvas.height = h;
+var canvas = document.getElementById('canvas')
+canvas.width = w
+canvas.height = h
 
-var ctx = canvas.getContext('2d');
+var ctx = canvas.getContext('2d')
 
 var _ = {
     randomColor: function() { return '#'+(Math.random()*0xFFFFFF<<0).toString(16); }
