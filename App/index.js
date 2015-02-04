@@ -87,7 +87,7 @@ scenes.start = {
   },
   setup: function() {
     circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
-    text.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px Arial"})
+    text.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
     _.addEventListeners( ['touchstart'], this.startCircles, false )
     _.addEventListeners( ['click'], this.startCircles, false )
   },
@@ -107,7 +107,7 @@ scenes.circles = {
     _.addEventListeners( ['touchstart', 'touchend', 'mousedown', 'mouseup'], this.lockCircles)
     _.addEventListeners( ['touchmove', 'mousemove'], this.moveCircles )
 
-    text.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", font: "40px Arial"})
+    text.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", font: "40px ArialMT"})
   },
   cleanup: function() {
     _.removeEventListeners( ['touchstart', 'touchend', 'mousedown', 'mouseup'], this.lockCircles )
@@ -150,7 +150,7 @@ scenes.circles = {
       }
     }
     if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
-      text.push({x: w/2 - 230, y: h/2 + 20, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px Arial"})
+      text.push({x: w/2 - 230, y: h/2 + 20, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px ArialMT"})
       setTimeout(function(){
         gotoScene('select')
       }, 2000)
@@ -168,7 +168,7 @@ scenes.select = {
 
     _.addEventListeners( ['touchstart'], this.touchCircles )
 
-    text.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", font: "40px Arial"})
+    text.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", font: "40px ArialMT"})
   },
   cleanup: function() {
     _.removeEventListeners( ['touchstart'], this.touchCircles )
@@ -187,7 +187,7 @@ scenes.select = {
       }
     }
     if(correct_touches>1){
-      text.push({x: 20, y: h/2 + 20, text: "daaamn you good with colors!", style: "#00FF00", font: "60px Arial"})
+      text.push({x: 20, y: h/2 + 20, text: "daaamn you good with colors!", style: "#00FF00", font: "60px ArialMT"})
       setTimeout(function(){
         gotoScene('swipe')
       }, 2000)
@@ -206,8 +206,8 @@ scenes.swipe = {
 
     _.addEventListeners( ['touchstart'], this.touchCircles )
     _.addEventListeners( ['touchmove'], this.moveCircles )
-    text.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px Arial"})
-    text.push({x: circles[0].x, y: circles[1].y, text: "0", style: "#0000FF", font: "30px Arial"})
+    text.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px ArialMT"})
+    text.push({x: circles[0].x, y: circles[1].y, text: "0", style: "#0000FF", font: "30px ArialMT"})
   },
   cleanup: function() {
     _.removeEventListeners( ['touchstart'], scene.touchCircles )
@@ -234,7 +234,7 @@ scenes.swipe = {
       }
 
       if(circles.length==1){
-        text.push({x: 20, y: h/2 + 20, text: "you got them all!", style: "#00FF00", font: "60px Arial"})
+        text.push({x: 20, y: h/2 + 20, text: "you got them all!", style: "#00FF00", font: "60px ArialMT"})
         setTimeout(function(){
           gotoScene('congrats')
         }, 2000)
