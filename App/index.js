@@ -161,8 +161,10 @@ scenes.circles = {
 scenes.select = {
   setup: function() {
     colors=["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
-    for(var i =0; i<9; i++){
-      circles.push({x: 20 + w/24 + (w/9 * i), y: h/2, r: h/12, c: colors[i%3]})
+    var circle_count = 9
+    var circle_radius = w / (circle_count * 4 / 3) / 2
+    for(var i =0; i<circle_count; i++){
+      circles.push({x: ((i+1) * 9/4 * circle_radius) + circle_radius, y: h/2, r: circle_radius, c: colors[i%3]})
     }
 
     _.addEventListeners( ['touchstart'], this.touchCircles )
