@@ -34,10 +34,10 @@ var _ = {
   }
 }
 
-var scene, loopId;
 var scenes = {}
 var circles = []
 var texts = []
+var sceneId = null
 var touch_to_circle_map = {}
 var touchstarthandler = function() {}
 var touchendhandler = function() {}
@@ -56,24 +56,21 @@ var loop = function() {
   })
 }
 
-var cleanup = function() {
-  canvas.removeEventListener('touchstart', touchstarthandler, false)
-  canvas.removeEventListener('touchmove', touchmovehandler, false)
-  canvas.removeEventListener('touchend', touchendhandler, false)
-  circles = []
-  texts = []
-}
-
-var gotoScene = function(newscene){
-  if(loopId) { clearInterval(loopId) }
-  cleanup()
-
-  scene = scenes[newscene]
-  scene.setup()
-  canvas.addEventListener('touchstart', touchstarthandler, false)
-  canvas.addEventListener('touchmove', touchmovehandler, false)
-  canvas.addEventListener('touchend', touchendhandler, false)
-  loopId = setInterval(loop, 1000/60)
+var gotoScene = function(scene){
+  if(sceneId != scene){
+    sceneId = scene
+    circles = []
+    texts = []
+    canvas.removeEventListener('touchstart', touchstarthandler, false)
+    canvas.removeEventListener('touchmove', touchmovehandler, false)
+    canvas.removeEventListener('touchend', touchendhandler, false)
+    scenes[scene].setup()
+    setTimeout(function(){
+      canvas.addEventListener('touchstart', touchstarthandler, false)
+      canvas.addEventListener('touchmove', touchmovehandler, false)
+      canvas.addEventListener('touchend', touchendhandler, false)
+    }, 100)
+  }
 }
 
 scenes.start = {
@@ -225,3 +222,4 @@ scenes.congrats = {
 }
 
 gotoScene('start')
+setInterval(loop, 1000/60)
