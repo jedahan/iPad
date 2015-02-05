@@ -200,7 +200,7 @@ scenes.select = {
 scenes.swipe = {
   setup: function() {
     var move_circle = false
-    colors=["rgba(0,0,0,0.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
+    colors=["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     for(var i =0; i<4; i++){
       circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i]})
     }
