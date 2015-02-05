@@ -36,16 +36,6 @@ var _ = {
     ctx.fillText(text.text, text.x, text.y)
     ctx.fillStyle = oldStyle
   }
-  , addEventListeners: function(events, handler) {
-    for(var i=0; i<events.length; i++){
-      canvas.addEventListener(events[i], handler, false);
-    }
-  }
-  , removeEventListeners: function(events, handler) {
-    for(var i=0; i<events.length; i++){
-      canvas.removeEventListener(events[i], handler, false);
-    }
-  }
 }
 
 var scene, loopId;
@@ -70,9 +60,9 @@ var loop = function() {
 }
 
 var cleanup = function() {
-  _.removeEventListeners( ['touchstart'], touchstarthandler )
-  _.removeEventListeners( ['touchend'], touchendhandler )
-  _.removeEventListeners( ['touchmove'], touchmovehandler )
+  canvas.removeEventListener('touchstart', touchstarthandler, false)
+  canvas.removeEventListener('touchmove', touchmovehandler, false)
+  canvas.removeEventListener('touchend', touchendhandler, false)
   circles = []
   text = []
 }
@@ -83,9 +73,9 @@ var gotoScene = function(newscene){
 
   scene = scenes[newscene]
   scene.setup()
-  _.addEventListeners( ['touchstart'], touchstarthandler )
-  _.addEventListeners( ['touchend'], touchendhandler )
-  _.addEventListeners( ['touchmove'], touchmovehandler )
+  canvas.addEventListener('touchstart', touchstarthandler, false)
+  canvas.addEventListener('touchmove', touchmovehandler, false)
+  canvas.addEventListener('touchend', touchendhandler, false)
   loopId = setInterval(loop, 1000/60)
 }
 
