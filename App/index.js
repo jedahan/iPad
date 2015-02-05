@@ -143,7 +143,7 @@ scenes.select = {
 
     touchstarthandler = this.touchstart
 
-    text.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", font: "40px ArialMT"})
+    texts.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", font: "40px ArialMT"})
   },
   touchstart: function(e) {
     var correct_touches=0
@@ -157,7 +157,7 @@ scenes.select = {
       }
     }
     if(correct_touches>1){
-      text.push({x: 20, y: 200, text: "daaamn you good with colors!", style: "#00FF00", font: "60px ArialMT"})
+      texts.push({x: 20, y: 200, text: "daaamn you good with colors!", style: "#00FF00", font: "60px ArialMT"})
       setTimeout(function(){
         gotoScene('swipe')
       }, 2000)
@@ -175,7 +175,7 @@ scenes.swipe = {
 
     touchstarthandler = this.touchCircles
     touchmovehandler = this.moveCircles
-    text.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px ArialMT"})
+    texts.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px ArialMT"})
   },
 
   touchCircles: function(e) {
@@ -204,7 +204,7 @@ scenes.swipe = {
       }
 
       if(caught>3){
-        text.push({x: 80, y: 120, text: "you got them all!", style: "#00FF00", font: "60px ArialMT"})
+        texts.push({x: 80, y: 120, text: "you got them all!", style: "#00FF00", font: "60px ArialMT"})
         setTimeout(function(){
           gotoScene('congrats')
         }, 2000)
