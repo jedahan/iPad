@@ -41,7 +41,7 @@ var _ = {
 var scene, loopId;
 var scenes = {}
 var circles = []
-var text = []
+var texts = []
 var touch_to_circle_map = {}
 var touchstarthandler = function() {}
 var touchendhandler = function() {}
@@ -49,14 +49,13 @@ var touchmovehandler = function() {}
 
 var loop = function() {
   _.clearScreen()
+  circles.forEach(function(circle){
+    _.drawCircle(circle)
+  })
 
-  for(var i = 0; i < circles.length; i++){
-    _.drawCircle(circles[i])
-  }
-
-  for(var j=0; j < text.length; j++){
-    _.drawText(text[j])
-  }
+  texts.forEach(function(text){
+    _.drawText(text)
+  })
 }
 
 var cleanup = function() {
@@ -64,7 +63,7 @@ var cleanup = function() {
   canvas.removeEventListener('touchmove', touchmovehandler, false)
   canvas.removeEventListener('touchend', touchendhandler, false)
   circles = []
-  text = []
+  texts = []
 }
 
 var gotoScene = function(newscene){
@@ -90,8 +89,8 @@ scenes.start = {
   },
   setup: function() {
     circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
-    text.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
     touchstarthandler = this.touchstarthandler
+    texts.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
   }
 }
 
@@ -104,7 +103,7 @@ scenes.circles = {
     touchendhandler = this.touchstart
     touchmovehandler = this.touchmove
 
-    text.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", font: "40px ArialMT"})
+    texts.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", font: "40px ArialMT"})
   },
   touchstart: function(e) {
     touch_to_circle_map = {}
