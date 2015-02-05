@@ -169,9 +169,9 @@ scenes.swipe = {
   setup: function() {
     var move_circle = false
     var colors = ["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
-    circles.forEach(function(circle){
-      circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i]})
-    })
+    for(var i=0; i<4; i++){
+      circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i % colors.length]})
+    }
 
     touchstarthandler = this.touchCircles
     touchmovehandler = this.moveCircles
