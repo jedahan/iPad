@@ -71,7 +71,6 @@ var gotoScene = function(newscene){
   if(loopId) { clearInterval(loopId) }
 
   scene = scenes[newscene]
-  _.clearScreen()
   scene.setup()
   loopId = setInterval(loop, 1000/60)
 }
