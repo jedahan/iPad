@@ -149,7 +149,7 @@ scenes.circles = {
       }
     }
     if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
-      text.push({x: w/2 - 230, y: h/2 + 20, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px ArialMT"})
+      text.push({x: w/2 - 230, y: 200, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px ArialMT"})
       setTimeout(function(){
         gotoScene('select')
       }, 2000)
@@ -186,7 +186,7 @@ scenes.select = {
       }
     }
     if(correct_touches>1){
-      text.push({x: 20, y: h/2 + 20, text: "daaamn you good with colors!", style: "#00FF00", font: "60px ArialMT"})
+      text.push({x: 20, y: 200, text: "daaamn you good with colors!", style: "#00FF00", font: "60px ArialMT"})
       setTimeout(function(){
         gotoScene('swipe')
       }, 2000)
