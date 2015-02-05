@@ -79,7 +79,7 @@ var gotoScene = function(newscene){
 }
 
 scenes.start = {
-  touchstarthandler: function( event ) {
+  touchstart: function( event ) {
     touchX = event.clientX || event.targetTouches[0].clientX
     touchY = event.clientY || event.targetTouches[0].clientY
     c = circles[0]
@@ -89,8 +89,9 @@ scenes.start = {
   },
   setup: function() {
     circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
-    touchstarthandler = this.touchstarthandler
     texts.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
+
+    touchstarthandler = this.touchstart
   }
 }
 
@@ -133,7 +134,7 @@ scenes.circles = {
 
 scenes.select = {
   setup: function() {
-    colors=["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
+    var colors = ["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     var circle_count = 9
     var circle_radius = w / (circle_count * 4 / 3) / 2
     for(var i =0; i<circle_count; i++){
@@ -164,14 +165,13 @@ scenes.select = {
   }
 }
 
-
 scenes.swipe = {
   setup: function() {
     var move_circle = false
-    colors=["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
-    for(var i =0; i<4; i++){
+    var colors = ["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
+    circles.forEach(function(circle){
       circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i]})
-    }
+    })
 
     touchstarthandler = this.touchCircles
     touchmovehandler = this.moveCircles
