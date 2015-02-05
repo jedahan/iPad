@@ -48,6 +48,12 @@ var loop = function() {
   ctx.fillRect(0, 0, w, h)
 
   circles.forEach(function(circle){
+    if(circle.v){
+      circle.x += circle.v.x
+      circle.y += circle.v.y
+      if(circle.x < 0 || circle.x > w){ circle.v.x *= -1 }
+      if(circle.y < 0 || circle.y > h){ circle.v.y *= -1 }
+    }
     _.drawCircle(circle)
   })
 
@@ -211,13 +217,22 @@ scenes.swipe = {
 scenes.congrats = {
   setup: function() {
     for(var i=0; i<100; i++){
-      circles.push({x: w * Math.random(), y: h * Math.random(), r: h/10 * Math.random(), c: _.randomAlphaColor()})
+      circles.push({
+        x: w * Math.random(),
+        y: h * Math.random(),
+        r: h/10 * Math.random(),
+        c: _.randomAlphaColor(),
+        v: {
+          x: Math.random() - 0.5,
+          y: Math.random() - 0.5
+          }
+        })
     }
     setInterval(function(){
       var i = Math.floor(Math.random()*circles.length)
-      circles[i].x += 3 * (Math.random()-0.5)
-      circles[i].y += 3 * (Math.random()-0.5)
-    }, 10)
+      circles[i].v.x = Math.min(Math.random() - 0.5 + circles[i].v.x, 1)
+      circles[i].v.y = Math.min(Math.random() - 0.5 + circles[i].v.y, 1)
+    }, 500)
   }
 }
 
