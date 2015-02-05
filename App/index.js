@@ -37,11 +37,13 @@ var _ = {
 var scenes = {}
 var circles = []
 var texts = []
-var sceneId = null
+var scene = null
 var touch_to_circle_map = {}
-var touchstarthandler = function() {}
-var touchendhandler = function() {}
-var touchmovehandler = function() {}
+var handlers = {
+  touchstart: null,
+  touchmove: null,
+  touchend: null
+}
 
 var loop = function() {
   ctx.fillStyle = '#ffffff'
@@ -62,24 +64,34 @@ var loop = function() {
   })
 }
 
-var gotoScene = function(scene){
-  if(sceneId != scene){
-    sceneId = scene
+var gotoScene = function(newscene){
+  var listeners = function(add){
+    for(var name in handlers) {
+      if (handlers.hasOwnProperty(name)){
+        if(scenes[scene] && scenes[scene][name]){
+          if(add)
+            canvas.addEventListener(name, scenes[scene][name], false)
+          else
+            canvas.removeEventListener(name, scenes[scene][name], false)
+        }
+      }
+    }
+  }
+  if(scene != newscene){
+    listeners(false)
+    scene = newscene
     circles = []
     texts = []
-    canvas.removeEventListener('touchstart', touchstarthandler, false)
-    canvas.removeEventListener('touchmove', touchmovehandler, false)
-    canvas.removeEventListener('touchend', touchendhandler, false)
     scenes[scene].setup()
-    setTimeout(function(){
-      canvas.addEventListener('touchstart', touchstarthandler, false)
-      canvas.addEventListener('touchmove', touchmovehandler, false)
-      canvas.addEventListener('touchend', touchendhandler, false)
-    }, 100)
+    listeners(true)
   }
 }
 
 scenes.start = {
+  setup: function() {
+    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
+    texts.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
+  },
   touchstart: function( event ) {
     touchX = event.clientX || event.targetTouches[0].clientX
     touchY = event.clientY || event.targetTouches[0].clientY
@@ -87,12 +99,6 @@ scenes.start = {
     if (_.pointInCircle(touchX, touchY, c.x, c.y, c.r)){
       gotoScene('circles')
     }
-  },
-  setup: function() {
-    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
-    texts.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
-
-    touchstarthandler = this.touchstart
   }
 }
 
@@ -100,11 +106,6 @@ scenes.circles = {
   setup: function() {
     circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
     circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
-
-    touchstarthandler = this.touchstart
-    touchendhandler = this.touchstart
-    touchmovehandler = this.touchmove
-
     texts.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", font: "40px ArialMT"})
   },
   touchstart: function(e) {
@@ -130,7 +131,8 @@ scenes.circles = {
         gotoScene('select')
       }, 2000)
     }
-  }
+  },
+  touchend: this.touchstart
 }
 
 scenes.select = {
@@ -141,9 +143,6 @@ scenes.select = {
     for(var i =0; i<circle_count; i++){
       circles.push({x: ((i+1) * 9/4 * circle_radius) + circle_radius, y: h/2, r: circle_radius, c: colors[i%3]})
     }
-
-    touchstarthandler = this.touchstart
-
     texts.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", font: "40px ArialMT"})
   },
   touchstart: function(e) {
@@ -173,19 +172,15 @@ scenes.swipe = {
     for(var i=0; i<4; i++){
       circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i % colors.length]})
     }
-
-    touchstarthandler = this.touchCircles
-    touchmovehandler = this.moveCircles
     texts.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px ArialMT"})
   },
-
-  touchCircles: function(e) {
+  touchstart: function(e) {
     var touchX = e.targetTouches[0].clientX
     var touchY = e.targetTouches[0].clientY
     move_circle = _.pointInCircle(touchX, touchY, circles[0].x, circles[0].y, circles[0].r)
     if(move_circle) { circles[0].caught=true }
   },
-  moveCircles: function(e) {
+  touchmove: function(e) {
     if(move_circle){
       var touchX = e.targetTouches[0].clientX
       var touchY = e.targetTouches[0].clientY
