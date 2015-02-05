@@ -19,10 +19,6 @@ var _ = {
                + ','+Math.floor(Math.random()*255)
                + ','+Math.random()+')'
   }
-  , clearScreen: function() {
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, w, h)
-  }
   , drawCircle: function(circle) {
     ctx.fillStyle = circle.c
     ctx.beginPath()
@@ -48,7 +44,9 @@ var touchendhandler = function() {}
 var touchmovehandler = function() {}
 
 var loop = function() {
-  _.clearScreen()
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, w, h)
+
   circles.forEach(function(circle){
     _.drawCircle(circle)
   })
