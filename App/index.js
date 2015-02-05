@@ -8,9 +8,9 @@ canvas.height = h
 var ctx = canvas.getContext('2d')
 
 var _ = {
-    randomColor: function() { return '#'+(Math.random()*0xFFFFFF<<0).toString(16); }
+    randomColor: function() { return '#'+(Math.random()*0xFFFFFF<<0).toString(16) }
   , pointInCircle: function(pX, pY, cX, cY, r){
-    var dx = pX - cX; var dy = pY - cY;
+    var dx = pX - cX; var dy = pY - cY
     return (dx*dx + dy*dy <= r * r)
   }
   , randomColorWithAlpha: function() {
