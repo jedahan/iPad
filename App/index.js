@@ -13,7 +13,7 @@ var _ = {
     var dx = pX - cX; var dy = pY - cY;
     return (dx*dx + dy*dy <= r * r)
   }
-  , randomAlphaColor: function() {
+  , randomColorWithAlpha: function() {
       return 'rgba('+Math.floor(Math.random()*255)
                + ','+Math.floor(Math.random()*255)
                + ','+Math.floor(Math.random()*255)
@@ -111,19 +111,19 @@ scenes.circles = {
   touchstart: function(e) {
     touch_to_circle_map = {}
     for(var i=0; i<e.targetTouches.length; i++){
-      var touchX = e.targetTouches[i].clientX;
-      var touchY = e.targetTouches[i].clientY;
+      var touchX = e.targetTouches[i].clientX
+      var touchY = e.targetTouches[i].clientY
       for(var j=0; j<circles.length; j++){
         if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r / 2)){
-          touch_to_circle_map[i] = j;
+          touch_to_circle_map[i] = j
         }
       }
     }
   },
   touchmove: function(e) {
     for(var i=0; i<e.targetTouches.length; i++){
-      circles[touch_to_circle_map[i]].x = e.targetTouches[i].clientX;
-      circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY;
+      circles[touch_to_circle_map[i]].x = e.targetTouches[i].clientX
+      circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY
     }
     if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
       texts.push({x: w/2 - 230, y: 200, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px ArialMT"})
@@ -148,8 +148,8 @@ scenes.select = {
   touchstart: function(e) {
     var correct_touches=0
     for(var i=0; i<e.targetTouches.length; i++){
-      var touchX = e.targetTouches[i].clientX;
-      var touchY = e.targetTouches[i].clientY;
+      var touchX = e.targetTouches[i].clientX
+      var touchY = e.targetTouches[i].clientY
       for(var j=1; j<circles.length; j+=3){
         if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r)){
           correct_touches++
@@ -216,7 +216,7 @@ scenes.congrats = {
         x: w * Math.random(),
         y: h * Math.random(),
         r: h/10 * Math.random(),
-        c: _.randomAlphaColor(),
+        c: _.randomColorWithAlpha(),
         v: {
           x: Math.random() - 0.5,
           y: Math.random() - 0.5
