@@ -208,7 +208,6 @@ scenes.swipe = {
     _.addEventListeners( ['touchstart'], this.touchCircles )
     _.addEventListeners( ['touchmove'], this.moveCircles )
     text.push({x: 120, y: h-60, text: "collect all the colors using the first circle as fast as possible", style: "#FF00FF", font: "30px ArialMT"})
-    text.push({x: circles[0].x, y: circles[1].y, text: "0", style: "#0000FF", font: "30px ArialMT"})
   },
   cleanup: function() {
     _.removeEventListeners( ['touchstart'], scene.touchCircles )
@@ -220,37 +219,34 @@ scenes.swipe = {
     var touchX = e.targetTouches[0].clientX
     var touchY = e.targetTouches[0].clientY
     move_circle = _.pointInCircle(touchX, touchY, circles[0].x, circles[0].y, circles[0].r)
+    if(move_circle) { circles[0].caught=true }
   },
   moveCircles: function(e) {
     if(move_circle){
       var touchX = e.targetTouches[0].clientX
       var touchY = e.targetTouches[0].clientY
-      circles[0].x = text[1].x = touchX
-      circles[0].y = text[1].y = touchY
+      var caught = 0
+      circles.forEach(function(c){
+        if(c.caught){
+          c.x = touchX
+          c.y = touchY
+          caught++
+        }
+      })
 
       for(var j=1; j<circles.length; j++){
         if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r/2)){
-          scene.addCircle(j)
+          circles[j].caught = true
         }
       }
 
-      if(circles.length==1){
-        text.push({x: 20, y: h/2 + 20, text: "you got them all!", style: "#00FF00", font: "60px ArialMT"})
+      if(caught>3){
+        text.push({x: 80, y: 120, text: "you got them all!", style: "#00FF00", font: "60px ArialMT"})
         setTimeout(function(){
           gotoScene('congrats')
         }, 2000)
       }
     }
-  },
-  addCircle: function(i) {
-    var newcircles = []
-    for(var j=0; j<circles.length; j++){
-      if(j!=i){
-        newcircles.push(circles[i])
-      }
-    }
-    circles=newcircles
-    text[1].text = 4-circles.length
   }
 }
 
