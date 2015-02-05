@@ -1,3 +1,4 @@
+'use strict';
 var w = window.innerWidth
 var h = window.innerHeight
 
@@ -39,6 +40,7 @@ var circles = []
 var texts = []
 var scene = null
 var touch_to_circle_map = {}
+var move_circle = false
 var handlers = {
   touchstart: null,
   touchmove: null,
@@ -93,9 +95,9 @@ scenes.start = {
     texts.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", font: "80px ArialMT"})
   },
   touchstart: function( event ) {
-    touchX = event.clientX || event.targetTouches[0].clientX
-    touchY = event.clientY || event.targetTouches[0].clientY
-    c = circles[0]
+    var touchX = event.clientX || event.targetTouches[0].clientX
+    var touchY = event.clientY || event.targetTouches[0].clientY
+    var c = circles[0]
     if (_.pointInCircle(touchX, touchY, c.x, c.y, c.r)){
       gotoScene('circles')
     }
@@ -167,7 +169,6 @@ scenes.select = {
 
 scenes.swipe = {
   setup: function() {
-    var move_circle = false
     var colors = ["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     for(var i=0; i<4; i++){
       circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i % colors.length]})
