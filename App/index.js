@@ -124,7 +124,7 @@ scenes.circles = {
       circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY;
     }
     if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
-      text.push({x: w/2 - 230, y: 200, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px ArialMT"})
+      texts.push({x: w/2 - 230, y: 200, text: "WOOHOO! ORANGE!", style: "#00FFFF", font: "80px ArialMT"})
       setTimeout(function(){
         gotoScene('select')
       }, 2000)
