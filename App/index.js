@@ -56,16 +56,28 @@ var handlers = {
   touchend: null
 }
 
+var accel
+
+window.ondevicemotion = function(event) {
+  accel = event.accelerationIncludingGravity
+}
+
 var loop = function() {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, w, h)
 
   circles.forEach(function(circle){
     if(circle.v){
+      if(accel){
+        circle.v.x += accel.x || 0
+        circle.v.y += accel.y || 0
+      }
       circle.x += circle.v.x
       circle.y += circle.v.y
-      if(circle.x < 0 || circle.x > w){ circle.v.x *= -1 }
-      if(circle.y < 0 || circle.y > h){ circle.v.y *= -1 }
+      if(circle.x < 0 ) circle.x = 0
+      if(circle.x > w) circle.x = w
+      if(circle.y < 0 ) circle.y = 0
+      if(circle.y > h) circle.y = h
     }
     _.drawCircle(circle)
   })
