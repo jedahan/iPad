@@ -36,6 +36,8 @@ var _ = {
     var oldStyle = ctx.fillStyle
     ctx.fillStyle = text.style
     ctx.font = text.size + " ArialMT"
+    text.x = text.x || (w-ctx.measureText(text.text).width) / 2
+    text.y = text.y || (ctx.measureText(text.text).actualBoundingBoxAscent) * 2
     ctx.fillText(text.text, text.x, text.y)
     ctx.fillStyle = oldStyle
   }
@@ -103,8 +105,8 @@ var gotoScene = function(newscene){
 
 scenes.start = {
   setup: function() {
-    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: _.randomColor()})
-    texts.push({x: w/2 - 130, y: h/2 + 20, text: "START!", style: "#FF00FF", size: "80px"})
+    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: '#3154a5'})
+    texts.push({y: h/2 + 20, text: "START!", style: "#FFFFFF", size: "80px"})
   },
   touchstart: function( event ) {
     var touchX = event.clientX || event.targetTouches[0].clientX
@@ -151,6 +153,7 @@ scenes.circles = {
 
 scenes.select = {
   setup: function() {
+    texts.push({text: "touch all the yellow circles at the same time", style: "#FF00FF", size: "40px"})
     var colors = ["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     var circle_count = 9
     var circle_radius = w / (circle_count * 4 / 3) / 2
@@ -170,8 +173,8 @@ scenes.select = {
         }
       }
     }
-    if(correct_touches>1){
-      texts.push({x: 20, y: 200, text: "daaamn you good with colors!", style: "#00FF00", size: "60px"})
+    if(correct_touches>=2){
+      texts.push({y: h-200, text: "Great multi-touching!", style: "#00FF00", size: "60px"})
       setTimeout(function(){
         gotoScene('swipe')
       }, 2000)
@@ -181,6 +184,7 @@ scenes.select = {
 
 scenes.swipe = {
   setup: function() {
+    texts.push({text: "Move the circle into the box", style: "#FF00FF", size: "30px"})
     var colors = ["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     circles.push({x: 2*h/12, y: h/2, r: h/12, c: colors[3]})
     boxes.push({x:w-(2*h/12), y: h/2, r: h/12, c: colors[2]})
