@@ -61,10 +61,6 @@ var handlers = {
 
 var accel
 
-window.ondevicemotion = function(event) {
-  accel = event.accelerationIncludingGravity
-}
-
 var loop = function() {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, w, h)
@@ -237,9 +233,9 @@ scenes.swipe = {
 
 scenes.pinch = {
   setup: function() {
+    texts.push({text: "Pinch these circles to bring them together", style: "#FF00FF"})
     circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
     circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
-    texts.push({text: "Pinch these circles to bring them together", style: "#FF00FF"})
   },
   touchstart: function(e) {
     if(e.targetTouches.length>=2){
@@ -262,7 +258,7 @@ scenes.pinch = {
         circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY
       }
       if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
-        texts.push({align: "bottom", text: "Congratulations, you made orange!", style: "#00FFFF"})
+        texts.push({align: "bottom", text: "Congratulations, you made orange!", style: "#FF7700"})
         setTimeout(function(){
           gotoScene('tilt')
         }, 2000)
@@ -274,6 +270,7 @@ scenes.pinch = {
 
 scenes.tilt = {
   setup: function() {
+    texts.push({text: "Tilt these circles to one side", style: "#FF00FF"})
     for(var i=0; i<100; i++){
       circles.push({
         x: w * Math.random(),
@@ -291,6 +288,16 @@ scenes.tilt = {
       circles[i].v.x = Math.min(Math.random() - 0.5 + circles[i].v.x, 1)
       circles[i].v.y = Math.min(Math.random() - 0.5 + circles[i].v.y, 1)
     }, 500)
+    setInterval(function(){
+      var oneTooFarRight = false
+      for(var i=0; i<circles.length; i++){
+        if(circles[i].x > w/6) oneTooFarRight = true
+      }
+      if(!oneTooFarRight){
+        texts.push({align: "bottom", text: "Nice, they are all on the left side!", style: "#00FF77"})
+        setTimeout(function(){ gotoScene("start") }, 2000)
+      }
+    }, 3000)
   }
 }
 
