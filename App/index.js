@@ -123,63 +123,55 @@ scenes.start = {
   touchstart: function( event ) {
     var touchX = event.clientX || event.targetTouches[0].clientX
     var touchY = event.clientY || event.targetTouches[0].clientY
-    var c = circles[0]
-    if (_.pointInCircle(touchX, touchY, c.x, c.y, c.r)){
-      gotoScene('circles')
+    if (_.pointInCircle(touchX, touchY, circles[0].x, circles[0].y, circles[0].r)){
+        gotoScene("touches")
     }
   }
 }
 
-scenes.circles = {
+scenes.touches = {
   setup: function() {
-    circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
-    circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
-    texts.push({x: 180, y: h-60, text: "Using one hand, make these circles orange!", style: "#FF00FF", size: "40px"})
+    circles.push({x: w*1/7, y: h*6/7, r: w/10, c: '#3154a5'})
+    circles.push({x: w*6/7, y: h*6/7, r: w/10, c: '#3154a5'})
+    circles.push({x: w*1/7, y: h*1/7, r: w/10, c: '#3154a5'})
+    circles.push({x: w*6/7, y: h*1/7, r: w/10, c: '#3154a5'})
+    texts.push({text: "Tap on each of the circles", style: "#00FFFF", size: "40px"})
   },
-  touchstart: function(e) {
-    touch_to_circle_map = {}
-    for(var i=0; i<e.targetTouches.length; i++){
-      var touchX = e.targetTouches[i].clientX
-      var touchY = e.targetTouches[i].clientY
-      for(var j=0; j<circles.length; j++){
-        if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r / 2)){
-          touch_to_circle_map[i] = j
-        }
+  touchstart: function( event ) {
+    var touchX = event.clientX || event.targetTouches[0].clientX
+    var touchY = event.clientY || event.targetTouches[0].clientY
+    for(var i=0; i<circles.length; i++){
+      if (_.pointInCircle(touchX, touchY, circles[i].x, circles[i].y, circles[i].r)){
+        circles.splice(i,1)
+        break
       }
     }
-  },
-  touchmove: function(e) {
-    for(var i=0; i<e.targetTouches.length; i++){
-      circles[touch_to_circle_map[i]].x = e.targetTouches[i].clientX
-      circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY
-    }
-    if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
-      texts.push({x: w/2 - 230, y: 200, text: "WOOHOO! ORANGE!", style: "#00FFFF", size: "80px"})
+    if(circles.length==0){
+      texts.push({y: h-200, text: "Fabulous tapping", style: "#00FFFF", size: "40px"})
       setTimeout(function(){
-        gotoScene('select')
+        gotoScene('multitouch')
       }, 2000)
     }
-  },
-  touchend: this.touchstart
+  }
 }
 
-scenes.select = {
+scenes.multitouch = {
   setup: function() {
     texts.push({text: "touch all the yellow circles at the same time", style: "#FF00FF", size: "40px"})
     var colors = ["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
-    var circle_count = 9
-    var circle_radius = w / (circle_count * 4 / 3) / 2
-    for(var i =0; i<circle_count; i++){
-      circles.push({x: ((i+1) * 9/4 * circle_radius) + circle_radius, y: h/2, r: circle_radius, c: colors[i%3]})
-    }
-    texts.push({x: 120, y: h-60, text: "touch all the yellow circles at the same time", style: "#FF00FF", size: "40px"})
+    var circle_radius = w/12
+    circles.push({x: (1 + circles.length) * circle_radius * 2, y: h/2, r: circle_radius, c: colors[1]})
+    circles.push({x: (1 + circles.length) * circle_radius * 2, y: h/2, r: circle_radius, c: colors[0]})
+    circles.push({x: (1 + circles.length) * circle_radius * 2, y: h/2, r: circle_radius, c: colors[1]})
+    circles.push({x: (1 + circles.length) * circle_radius * 2, y: h/2, r: circle_radius, c: colors[2]})
+    circles.push({x: (1 + circles.length) * circle_radius * 2, y: h/2, r: circle_radius, c: colors[1]})
   },
   touchstart: function(e) {
     var correct_touches=0
     for(var i=0; i<e.targetTouches.length; i++){
       var touchX = e.targetTouches[i].clientX
       var touchY = e.targetTouches[i].clientY
-      for(var j=1; j<circles.length; j+=3){
+      for(var j=0; j<circles.length; j+=2){
         if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r)){
           correct_touches++
         }
@@ -203,7 +195,6 @@ scenes.swipe = {
   },
   touchstart: function(e) {
     move_circle = _.pointInCircle(e.targetTouches[0].clientX, e.targetTouches[0].clientY, circles[0].x, circles[0].y, circles[0].r)
-    if(move_circle) { circles[0].caught=true }
   },
   touchmove: function(e) {
     if(move_circle){
@@ -222,23 +213,44 @@ scenes.swipe = {
   }
 }
 
-      for(var j=1; j<circles.length; j++){
-        if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r/2)){
-          circles[j].caught = true
+scenes.pinch = {
+  setup: function() {
+    circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
+    circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
+    texts.push({text: "Pinch these circles to bring them together", style: "#FF00FF", size: "40px"})
+  },
+  touchstart: function(e) {
+    if(e.targetTouches.length>=2){
+      touch_to_circle_map = {}
+      for(var i=0; i<e.targetTouches.length; i++){
+        var touchX = e.targetTouches[i].clientX
+        var touchY = e.targetTouches[i].clientY
+        for(var j=0; j<circles.length; j++){
+          if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r / 2)){
+            touch_to_circle_map[i] = j
+          }
         }
       }
-
-      if(caught>3){
-        texts.push({x: 80, y: 120, text: "you got them all!", style: "#00FF00", size: "60px"})
+    }
+  },
+  touchmove: function(e) {
+    if(e.targetTouches.length>=2){
+      for(var i=0; i<e.targetTouches.length; i++){
+        circles[touch_to_circle_map[i]].x = e.targetTouches[i].clientX
+        circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY
+      }
+      if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
+        texts.push({y: h-100, text: "Congratulations, you made orange!", style: "#00FFFF", size: "40px"})
         setTimeout(function(){
-          gotoScene('congrats')
+          gotoScene('tilt')
         }, 2000)
       }
     }
-  }
+  },
+  touchend: this.touchstart
 }
 
-scenes.congrats = {
+scenes.tilt = {
   setup: function() {
     for(var i=0; i<100; i++){
       circles.push({
