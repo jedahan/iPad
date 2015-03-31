@@ -26,6 +26,12 @@ var _ = {
     ctx.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI, true)
     ctx.fill()
   }
+  , drawBox: function(box) {
+    var oldStyle = ctx.fillStyle
+    ctx.fillStyle = box.c
+    ctx.fillRect(box.x-box.r,box.y-box.r,2*box.r,2*box.r)
+    ctx.fillStyle = oldStyle
+  }
   , drawText: function(text) {
     var oldStyle = ctx.fillStyle
     ctx.fillStyle = text.style
@@ -37,6 +43,7 @@ var _ = {
 
 var scenes = {}
 var circles = []
+var boxes = []
 var texts = []
 var scene = null
 var touch_to_circle_map = {}
@@ -59,6 +66,10 @@ var loop = function() {
       if(circle.y < 0 || circle.y > h){ circle.v.y *= -1 }
     }
     _.drawCircle(circle)
+  })
+
+  boxes.forEach(function(box){
+    _.drawBox(box)
   })
 
   texts.forEach(function(text){
@@ -84,6 +95,7 @@ var gotoScene = function(newscene){
     scene = newscene
     circles = []
     texts = []
+    boxes = []
     scenes[scene].setup()
     listeners(true)
   }
@@ -170,10 +182,8 @@ scenes.select = {
 scenes.swipe = {
   setup: function() {
     var colors = ["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
-    for(var i=0; i<4; i++){
-      circles.push({x: 40 + w/12 + (w/4 * i), y: h/2, r: h/6, c: colors[i % colors.length]})
-    }
-    texts.push({x: 120, y: h-60, text: "collect all the colors by swiping left right", style: "#FF00FF", size: "30px"})
+    circles.push({x: 2*h/12, y: h/2, r: h/12, c: colors[3]})
+    boxes.push({x:w-(2*h/12), y: h/2, r: h/12, c: colors[2]})
   },
   touchstart: function(e) {
     move_circle = _.pointInCircle(e.targetTouches[0].clientX, e.targetTouches[0].clientY, circles[0].x, circles[0].y, circles[0].r)
@@ -183,14 +193,18 @@ scenes.swipe = {
     if(move_circle){
       var touchX = e.targetTouches[0].clientX
       var touchY = e.targetTouches[0].clientY
-      var caught = 0
-      circles.forEach(function(c){
-        if(c.caught){
-          c.x = touchX
-          c.y = touchY
-          caught++
-        }
-      })
+      circles[0].x = touchX
+      circles[0].y = touchY
+    }
+
+    if(_.pointInCircle(circles[0].x, circles[0].y, boxes[0].x, boxes[0].y, circles[0].r)){
+      texts.push({y: h-100, text: "circle in the box!", style: "#00FF00", size: "60px"})
+      setTimeout(function(){
+        gotoScene('pinch')
+      }, 2000)
+    }
+  }
+}
 
       for(var j=1; j<circles.length; j++){
         if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r/2)){
