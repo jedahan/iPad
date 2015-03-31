@@ -37,7 +37,7 @@ var _ = {
   , drawText: function(text) {
     var oldStyle = ctx.fillStyle
     ctx.fillStyle = text.style || "#FFFFFF"
-    ctx.font = text.size || "40px" + " ArialMT"
+    ctx.font = text.size || "40px" + " Verdana"
     var x = text.x || (w-ctx.measureText(text.text).width) / 2
     var y = text.y || (ctx.measureText(text.text).actualBoundingBoxAscent) * 2
     if(text.align == "bottom") y = h - y
@@ -100,7 +100,7 @@ var loop = function() {
 }
 
 var restart_circle = {x: w, y: h, r: 80, c: "#a53154"}
-var restart_text = {x: w-60, y: h-20, text: "restart", size: "20px"}
+var restart_text = {x: w-70, y: h-15, text: "restart", size: "20px"}
 var restart = function(event) {
   var touchX = event.clientX || event.changedTouches[0].clientX
   var touchY = event.clientY || event.changedTouches[0].clientY
@@ -139,7 +139,7 @@ var gotoScene = function(newscene){
 
 scenes.start = {
   setup: function() {
-    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: '#3154a5'})
+    circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: '#0E43C8'})
     texts.push({y: h/2 + 20, text: "START!"})
   },
   touchstart: function( event ) {
@@ -153,11 +153,11 @@ scenes.start = {
 
 scenes.touches = {
   setup: function() {
-    texts.push({text: "Tap on each of the circles", style: "#00FFFF"})
-    circles.push({x: w*1/7, y: h*6/7, r: w/10, c: '#3154a5'})
-    circles.push({x: w*6/7, y: h*6/7, r: w/10, c: '#3154a5'})
-    circles.push({x: w*1/7, y: h*1/7, r: w/10, c: '#3154a5'})
-    circles.push({x: w*6/7, y: h*1/7, r: w/10, c: '#3154a5'})
+    texts.push({text: "Tap on each of the circles", style: "#0E43C8"})
+    circles.push({x: w*1/7, y: h*6/7, r: w/10, c: '#0E43C8'})
+    circles.push({x: w*6/7, y: h*6/7, r: w/10, c: '#0E43C8'})
+    circles.push({x: w*1/7, y: h*1/7, r: w/10, c: '#0E43C8'})
+    circles.push({x: w*6/7, y: h*1/7, r: w/10, c: '#0E43C8'})
   },
   touchstart: function( event ) {
     var touchX = event.clientX || event.targetTouches[0].clientX
@@ -169,7 +169,7 @@ scenes.touches = {
       }
     }
     if(circles.length==0){
-      texts.push({align: "bottom", text: "Fabulous tapping", style: "#00FFFF"})
+      texts.push({align: "bottom", text: "Fabulous tapping", style: "#0E43C8"})
       setTimeout(function(){
         gotoScene('multitouch')
       }, 2000)
