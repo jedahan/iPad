@@ -5,6 +5,8 @@ var h = window.innerHeight
 var canvas = document.getElementById('canvas')
 canvas.width = w
 canvas.height = h
+canvas.MSAAEnabled = true
+canvas.MSAASamples = 4
 
 var ctx = canvas.getContext('2d')
 
