@@ -60,6 +60,10 @@ var handlers = {
 }
 
 var accel
+window.ondevicemotion = function(e) {
+  accel.x = e.getAccelerationIncludingGravity.x
+  accel.y = e.getAccelerationIncludingGravity.y
+}
 
 var loop = function() {
   ctx.fillStyle = '#ffffff'
