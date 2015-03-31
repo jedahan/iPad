@@ -36,11 +36,12 @@ var _ = {
   }
   , drawText: function(text) {
     var oldStyle = ctx.fillStyle
-    ctx.fillStyle = text.style
-    ctx.font = text.size + " ArialMT"
-    text.x = text.x || (w-ctx.measureText(text.text).width) / 2
-    text.y = text.y || (ctx.measureText(text.text).actualBoundingBoxAscent) * 2
-    ctx.fillText(text.text, text.x, text.y)
+    ctx.fillStyle = text.style || "#FFFFFF"
+    ctx.font = text.size || "40px" + " ArialMT"
+    var x = text.x || (w-ctx.measureText(text.text).width) / 2
+    var y = text.y || (ctx.measureText(text.text).actualBoundingBoxAscent) * 2
+    if(text.align == "bottom") y = h - y
+    ctx.fillText(text.text, x, y)
     ctx.fillStyle = oldStyle
   }
 }
@@ -99,7 +100,7 @@ var loop = function() {
 }
 
 var restart_circle = {x: w, y: h, r: 80, c: "#a53154"}
-var restart_text = {x: w-60, y: h-20, text: "restart", style: "#FFFFFF", size: "20px"}
+var restart_text = {x: w-60, y: h-20, text: "restart", size: "20px"}
 var restart = function(event) {
   var touchX = event.clientX || event.changedTouches[0].clientX
   var touchY = event.clientY || event.changedTouches[0].clientY
@@ -139,7 +140,7 @@ var gotoScene = function(newscene){
 scenes.start = {
   setup: function() {
     circles.push({x: w/2, y: h/2, r: Math.min(w/3,h/3), c: '#3154a5'})
-    texts.push({y: h/2 + 20, text: "START!", style: "#FFFFFF", size: "80px"})
+    texts.push({y: h/2 + 20, text: "START!"})
   },
   touchstart: function( event ) {
     var touchX = event.clientX || event.targetTouches[0].clientX
@@ -152,11 +153,11 @@ scenes.start = {
 
 scenes.touches = {
   setup: function() {
+    texts.push({text: "Tap on each of the circles", style: "#00FFFF"})
     circles.push({x: w*1/7, y: h*6/7, r: w/10, c: '#3154a5'})
     circles.push({x: w*6/7, y: h*6/7, r: w/10, c: '#3154a5'})
     circles.push({x: w*1/7, y: h*1/7, r: w/10, c: '#3154a5'})
     circles.push({x: w*6/7, y: h*1/7, r: w/10, c: '#3154a5'})
-    texts.push({text: "Tap on each of the circles", style: "#00FFFF", size: "40px"})
   },
   touchstart: function( event ) {
     var touchX = event.clientX || event.targetTouches[0].clientX
@@ -168,7 +169,7 @@ scenes.touches = {
       }
     }
     if(circles.length==0){
-      texts.push({y: h-200, text: "Fabulous tapping", style: "#00FFFF", size: "40px"})
+      texts.push({align: "bottom", text: "Fabulous tapping", style: "#00FFFF"})
       setTimeout(function(){
         gotoScene('multitouch')
       }, 2000)
@@ -178,7 +179,7 @@ scenes.touches = {
 
 scenes.multitouch = {
   setup: function() {
-    texts.push({text: "touch all the yellow circles at the same time", style: "#FF00FF", size: "40px"})
+    texts.push({text: "touch all the yellow circles at the same time", style: "#FF00FF"})
     var colors = ["rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     var circle_radius = w/12
     circles.push({x: (1 + circles.length) * circle_radius * 2, y: h/2, r: circle_radius, c: colors[1]})
@@ -199,7 +200,7 @@ scenes.multitouch = {
       }
     }
     if(correct_touches>=2){
-      texts.push({y: h-200, text: "Great multi-touching!", style: "#00FF00", size: "60px"})
+      texts.push({align: "bottom", text: "Great multi-touching!", style: "#00FF00"})
       setTimeout(function(){
         gotoScene('swipe')
       }, 2000)
@@ -209,7 +210,7 @@ scenes.multitouch = {
 
 scenes.swipe = {
   setup: function() {
-    texts.push({text: "Move the circle into the box", style: "#FF00FF", size: "30px"})
+    texts.push({text: "Move the circle into the box", style: "#FF00FF"})
     var colors = ["rgba(220,220,220,220.5)", "rgba(0,255,255,0.5)", "rgba(255,255,0,0.5)", "rgba(255,0,255,0.5)"]
     circles.push({x: 2*h/12, y: h/2, r: h/12, c: colors[3]})
     boxes.push({x:w-(2*h/12), y: h/2, r: h/12, c: colors[2]})
@@ -226,7 +227,7 @@ scenes.swipe = {
     }
 
     if(_.pointInCircle(circles[0].x, circles[0].y, boxes[0].x, boxes[0].y, circles[0].r)){
-      texts.push({y: h-100, text: "circle in the box!", style: "#00FF00", size: "60px"})
+      texts.push({align: "bottom", text: "circle in the box!", style: "#00FF00"})
       setTimeout(function(){
         gotoScene('pinch')
       }, 2000)
@@ -238,7 +239,7 @@ scenes.pinch = {
   setup: function() {
     circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
     circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
-    texts.push({text: "Pinch these circles to bring them together", style: "#FF00FF", size: "40px"})
+    texts.push({text: "Pinch these circles to bring them together", style: "#FF00FF"})
   },
   touchstart: function(e) {
     if(e.targetTouches.length>=2){
@@ -261,7 +262,7 @@ scenes.pinch = {
         circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY
       }
       if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
-        texts.push({y: h-100, text: "Congratulations, you made orange!", style: "#00FFFF", size: "40px"})
+        texts.push({align: "bottom", text: "Congratulations, you made orange!", style: "#00FFFF"})
         setTimeout(function(){
           gotoScene('tilt')
         }, 2000)
