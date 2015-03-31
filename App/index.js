@@ -91,6 +91,21 @@ var loop = function() {
   texts.forEach(function(text){
     _.drawText(text)
   })
+
+  if(scene != "start") {
+    _.drawCircle(restart_circle)
+    _.drawText(restart_text)
+  }
+}
+
+var restart_circle = {x: w, y: h, r: 80, c: "#a53154"}
+var restart_text = {x: w-60, y: h-20, text: "restart", style: "#FFFFFF", size: "20px"}
+var restart = function(event) {
+  var touchX = event.clientX || event.changedTouches[0].clientX
+  var touchY = event.clientY || event.changedTouches[0].clientY
+  if(_.pointInCircle(touchX, touchY, restart_circle.x, restart_circle.y, restart_circle.r)) {
+    gotoScene("start")
+  }
 }
 
 var gotoScene = function(newscene){
@@ -113,6 +128,10 @@ var gotoScene = function(newscene){
     texts = []
     boxes = []
     scenes[scene].setup()
+    if(scene != "start") {
+      canvas.removeEventListener("touchend", restart, false)
+      canvas.addEventListener("touchend", restart, false)
+    }
     listeners(true)
   }
 }
