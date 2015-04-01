@@ -10,6 +10,11 @@ canvas.MSAASamples = 4
 
 var ctx = canvas.getContext('2d')
 
+var accel
+document.addEventListener("devicemotion", function(e){
+  accel = e.accelerationIncludingGravity
+})
+
 var _ = {
     randomColor: function() { return '#'+(Math.random()*0xFFFFFF<<0).toString(16) }
   , pointInCircle: function(pX, pY, cX, cY, r){
@@ -36,11 +41,15 @@ var _ = {
   }
   , drawText: function(text) {
     var oldStyle = ctx.fillStyle
-    ctx.fillStyle = text.style || "#FFFFFF"
     ctx.font = text.size || "40px" + " Verdana"
-    var x = text.x || (w-ctx.measureText(text.text).width) / 2
-    var y = text.y || (ctx.measureText(text.text).actualBoundingBoxAscent) * 2
+    var textWidth = ctx.measureText(text.text).width
+    var textHeight = ctx.measureText(text.text).actualBoundingBoxAscent
+    var x = text.x || (w-textWidth) / 2
+    var y = text.y || (textHeight) * 2
     if(text.align == "bottom") y = h - y
+    ctx.fillStyle = text.background || "#FFFFFF"
+    if(text.background) ctx.fillRect(x-10,y-textHeight*1.5,textWidth+20, textHeight*2)
+    ctx.fillStyle = text.style || "#FFFFFF"
     ctx.fillText(text.text, x, y)
     ctx.fillStyle = oldStyle
   }
@@ -59,12 +68,6 @@ var handlers = {
   touchend: null
 }
 
-var accel
-window.ondevicemotion = function(e) {
-  accel.x = e.getAccelerationIncludingGravity.x
-  accel.y = e.getAccelerationIncludingGravity.y
-}
-
 var loop = function() {
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, w, h)
@@ -72,15 +75,15 @@ var loop = function() {
   circles.forEach(function(circle){
     if(circle.v){
       if(accel){
-        circle.v.x += accel.x || 0
-        circle.v.y += accel.y || 0
+        circle.v.x -= accel.y + Math.random()/5 || 0
+        circle.v.y -= accel.x + Math.random()/5 || 0
       }
       circle.x += circle.v.x
       circle.y += circle.v.y
-      if(circle.x < 0 ) circle.x = 0
-      if(circle.x > w) circle.x = w
-      if(circle.y < 0 ) circle.y = 0
-      if(circle.y > h) circle.y = h
+      if(circle.x < 0 ) circle.x = 0, circle.v.x *= -0.7
+      if(circle.x > w) circle.x = w, circle.v.x *= -0.7
+      if(circle.y < 0 ) circle.y = 0, circle.v.y *= -0.7
+      if(circle.y > h) circle.y = h, circle.v.y *= -0.7
     }
     _.drawCircle(circle)
   })
@@ -205,7 +208,7 @@ scenes.multitouch = {
         }
       }
     }
-    if(correct_touches>=2){
+    if(correct_touches>=3){
       texts.push({align: "bottom", text: "Great multi-touching!", style: "#00FF00"})
       gotoSceneSoon('swipe')
     }
@@ -240,8 +243,8 @@ scenes.swipe = {
 scenes.pinch = {
   setup: function() {
     texts.push({text: "Pinch these circles to bring them together", style: "#FF00FF"})
-    circles.push({x: 1*w/3, y: h/2, r: h/12, c: "rgba(255,0,0,0.5)"})
-    circles.push({x: 2*w/3, y: h/2, r: h/12, c: "rgba(255,255,0,0.5)"})
+    circles.push({x: 1*w/3, y: h/2, r: h/7, c: "rgba(255,0,0,0.5)"})
+    circles.push({x: 2*w/3, y: h/2, r: h/7, c: "rgba(255,255,0,0.5)"})
   },
   touchstart: function(e) {
     if(e.targetTouches.length>=2){
@@ -250,7 +253,7 @@ scenes.pinch = {
         var touchX = e.targetTouches[i].clientX
         var touchY = e.targetTouches[i].clientY
         for(var j=0; j<circles.length; j++){
-          if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r / 2)){
+          if(_.pointInCircle(touchX, touchY, circles[j].x, circles[j].y, circles[j].r)){
             touch_to_circle_map[i] = j
           }
         }
@@ -258,12 +261,12 @@ scenes.pinch = {
     }
   },
   touchmove: function(e) {
-    if(e.targetTouches.length>=2){
+    if(touch_to_circle_map[0] != null && touch_to_circle_map[1] != null){
       for(var i=0; i<e.targetTouches.length; i++){
         circles[touch_to_circle_map[i]].x = e.targetTouches[i].clientX
         circles[touch_to_circle_map[i]].y = e.targetTouches[i].clientY
       }
-      if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
+      if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r)){
         texts.push({align: "bottom", text: "Congratulations, you made orange!", style: "#FF7700"})
         gotoSceneSoon('tilt')
       }
@@ -274,7 +277,7 @@ scenes.pinch = {
 
 scenes.tilt = {
   setup: function() {
-    texts.push({text: "Tilt these circles to the left side", style: "#FF00FF"})
+    texts.push({text: "Tilt these circles to the left side", style: "#FF00FF", background: "rgba(255,255,255,0.9)"})
     for(var i=0; i<100; i++){
       circles.push({
         x: w * Math.random(),
@@ -285,7 +288,7 @@ scenes.tilt = {
           x: Math.random() - 0.5,
           y: Math.random() - 0.5
           }
-        })
+      })
     }
     var circleMoveInterval = setInterval(function(){
       var i = Math.floor(Math.random()*circles.length)
@@ -298,10 +301,10 @@ scenes.tilt = {
         if(circles[i].x > w/6) oneTooFarRight = true
       }
       if(!oneTooFarRight){
-        texts.push({align: "bottom", text: "Nice, they are all on the left side!", style: "#00FF77"})
+        texts.push({align: "bottom", text: "You're a tilt master! Press restart to play again", style: "#00FF77"})
         clearInterval(circleMoveInterval)
         clearInterval(tiltToLeftInterval)
-        gotoSceneSoon("start")
+        gotoSceneSoon("start", 120 * 1000)
       }
     }, 3000)
   }
