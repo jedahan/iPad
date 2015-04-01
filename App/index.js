@@ -99,17 +99,29 @@ var loop = function() {
   }
 }
 
+// keep track of last timeout so we can stop it if we want to restart
+var timeoutId = null
+
 var restart_circle = {x: w, y: h, r: 80, c: "#a53154"}
 var restart_text = {x: w-70, y: h-15, text: "restart", size: "20px"}
 var restart = function(event) {
   var touchX = event.clientX || event.changedTouches[0].clientX
   var touchY = event.clientY || event.changedTouches[0].clientY
   if(_.pointInCircle(touchX, touchY, restart_circle.x, restart_circle.y, restart_circle.r)) {
+    clearTimeout(timeoutId)
+    timeoutId = null
     gotoScene("start")
   }
 }
 
-var gotoScene = function(newscene){
+canvas.addEventListener("touchend", restart, false)
+
+var gotoSceneSoon = function(newscene){
+  clearTimeout(timeoutId)
+  timeoutId = setTimeout(function(){ gotoScene(newscene) }, 2000)
+}
+
+var gotoScene = function (newscene) {
   var listeners = function(add){
     for(var name in handlers) {
       if (handlers.hasOwnProperty(name)){
@@ -129,10 +141,6 @@ var gotoScene = function(newscene){
     texts = []
     boxes = []
     scenes[scene].setup()
-    if(scene != "start") {
-      canvas.removeEventListener("touchend", restart, false)
-      canvas.addEventListener("touchend", restart, false)
-    }
     listeners(true)
   }
 }
@@ -146,7 +154,7 @@ scenes.start = {
     var touchX = event.clientX || event.targetTouches[0].clientX
     var touchY = event.clientY || event.targetTouches[0].clientY
     if (_.pointInCircle(touchX, touchY, circles[0].x, circles[0].y, circles[0].r)){
-        gotoScene("touches")
+      gotoScene("touches")
     }
   }
 }
@@ -170,9 +178,7 @@ scenes.touches = {
     }
     if(circles.length==0){
       texts.push({align: "bottom", text: "Fabulous tapping", style: "#0E43C8"})
-      setTimeout(function(){
-        gotoScene('multitouch')
-      }, 2000)
+      gotoSceneSoon('multitouch')
     }
   }
 }
@@ -201,9 +207,7 @@ scenes.multitouch = {
     }
     if(correct_touches>=2){
       texts.push({align: "bottom", text: "Great multi-touching!", style: "#00FF00"})
-      setTimeout(function(){
-        gotoScene('swipe')
-      }, 2000)
+      gotoSceneSoon('swipe')
     }
   }
 }
@@ -228,9 +232,7 @@ scenes.swipe = {
 
     if(_.pointInCircle(circles[0].x, circles[0].y, boxes[0].x, boxes[0].y, circles[0].r)){
       texts.push({align: "bottom", text: "circle in the box!", style: "#00FF00"})
-      setTimeout(function(){
-        gotoScene('pinch')
-      }, 2000)
+      gotoSceneSoon('pinch')
     }
   }
 }
@@ -263,9 +265,7 @@ scenes.pinch = {
       }
       if(_.pointInCircle(circles[0].x, circles[0].y, circles[1].x, circles[1].y, circles[1].r / 4)){
         texts.push({align: "bottom", text: "Congratulations, you made orange!", style: "#FF7700"})
-        setTimeout(function(){
-          gotoScene('tilt')
-        }, 2000)
+        gotoSceneSoon('tilt')
       }
     }
   },
@@ -274,7 +274,7 @@ scenes.pinch = {
 
 scenes.tilt = {
   setup: function() {
-    texts.push({text: "Tilt these circles to one side", style: "#FF00FF"})
+    texts.push({text: "Tilt these circles to the left side", style: "#FF00FF"})
     for(var i=0; i<100; i++){
       circles.push({
         x: w * Math.random(),
@@ -287,19 +287,21 @@ scenes.tilt = {
           }
         })
     }
-    setInterval(function(){
+    var circleMoveInterval = setInterval(function(){
       var i = Math.floor(Math.random()*circles.length)
       circles[i].v.x = Math.min(Math.random() - 0.5 + circles[i].v.x, 1)
       circles[i].v.y = Math.min(Math.random() - 0.5 + circles[i].v.y, 1)
     }, 500)
-    setInterval(function(){
+    var tiltToLeftInterval = setInterval(function(){
       var oneTooFarRight = false
       for(var i=0; i<circles.length; i++){
         if(circles[i].x > w/6) oneTooFarRight = true
       }
       if(!oneTooFarRight){
         texts.push({align: "bottom", text: "Nice, they are all on the left side!", style: "#00FF77"})
-        setTimeout(function(){ gotoScene("start") }, 2000)
+        clearInterval(circleMoveInterval)
+        clearInterval(tiltToLeftInterval)
+        gotoSceneSoon("start")
       }
     }, 3000)
   }
